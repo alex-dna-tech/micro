@@ -9,8 +9,8 @@ ENV USER=micro
 ENV GROUPNAME=$USER
 ARG UID=1001
 ARG GID=1001
-RUN apk --no-cache add make gcc g++
-RUN apk --no-cache add git curl ca-certificates
+# RUN apk --no-cache add make gcc g++
+# RUN apk --no-cache add git curl ca-certificates
 COPY --from=0 /usr/local/go /usr/local/go
 ENV PATH /usr/local/go/bin:/$USER/go/bin:$PATH
 RUN addgroup --gid "$GID" "$GROUPNAME" \

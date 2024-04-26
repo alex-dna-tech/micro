@@ -50,7 +50,8 @@ gorelease-dry-run:
 	docker run \
 		--rm \
 		-e CGO_ENABLED=1 \
+		-v /var/run/docker.sock:/var/run/docker.sock \
 		-v $(CURDIR):/$(NAME) \
 		-w /$(NAME) \
 		ghcr.io/goreleaser/goreleaser-cross:v1.20.6 \
-		--clean --skip-validate --skip-publish
+		--clean --verbose --skip-validate --skip-publish --snapshot
