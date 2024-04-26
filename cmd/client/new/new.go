@@ -21,7 +21,6 @@ import (
 func protoComments(goDir, alias string) []string {
 	return []string{
 		"cd " + alias,
-		"go mod tidy",
 		"make proto",
 		"micro run .\n",
 	}
@@ -173,6 +172,8 @@ func Run(ctx *cli.Context) error {
 	goVersion := runtime.Version()
 	if strings.HasPrefix(goVersion, "go") {
 		goVersion = strings.TrimPrefix(goVersion, "go")
+		parts := strings.Split(goVersion, ".")
+		goVersion = parts[0] + "." + parts[1]
 	}
 
 	c := config{
@@ -207,7 +208,7 @@ func init() {
 	cmd.Register(&cli.Command{
 		Name:        "new",
 		Usage:       "Create a service template",
-		Description: `'micro new' scaffolds a new service skeleton. Example: 'micro new helloworld && cd helloworld'`,
+		Description: `'micro new' scaffolds a new service skeleton. Example: 'micro new hello && cd hello'`,
 		Action:      Run,
 	})
 }

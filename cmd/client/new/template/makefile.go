@@ -10,6 +10,9 @@ ifeq ($(GOOS),windows)
 else
 	TARGET := $(NAME)
 endif
+PROTOC ?= $(shell which protoc || echo "$(GOBIN)/protoc")
+PROTOC_GEN_GO ?= $(GOBIN)/protoc-gen-go
+PROTOC_GEN_MICRO ?= $(GOBIN)/protoc-gen-micro
 PROTO_FILES := $(wildcard proto/*.proto)
 PROTO_GO := $(PROTO_FILES:%.proto=%.pb.go)
 PROTO_GO_MICRO := $(PROTO_FILES:%.proto=%.pb.micro.go)
@@ -26,10 +29,14 @@ clean:
 
 include dep-install.mk
 
-.PHONY: proto
-proto: proto/$(NAME).pb.micro.go
+.PHONY: tidy
+tidy:
+	go mod tidy
 
-%.pb.go %.pb.micro.go: %.proto
+.PHONY: proto
+proto: tidy proto/$(NAME).pb.micro.go proto/$(NAME).pb.go
+
+%.pb.go %.pb.micro.go: %.proto $(PROTOC) $(PROTOC_GEN_MICRO) $(PROTOC_GEN_GO)
 	protoc --proto_path=. --go_out=:. --micro_out=. $<
 
 .PHONY: test

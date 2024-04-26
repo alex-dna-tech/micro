@@ -1,9 +1,9 @@
 package template
 
 var (
-	DepInstall = `PROTOC_GEN_GO := $(GOBIN)/protoc-gen-go
-PROTOC_GEN_MICRO := $(GOBIN)/protoc-gen-micro
-PROTOC = $(shell which protoc || echo "$(GOBIN)/protoc")
+	DepInstall = `PROTOC_GEN_GO ?= $(GOBIN)/protoc-gen-go
+PROTOC_GEN_MICRO ?= $(GOBIN)/protoc-gen-micro
+PROTOC ?= $(shell which protoc || echo "$(GOBIN)/protoc")
 
 # Generate protoc latest binary url
 PROTOC_RELEASE_BIN := protoc
