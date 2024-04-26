@@ -1,8 +1,8 @@
 # Micro
 
 <p>
-    <a href="https://goreportcard.com/report/github.com/micro/micro">
-    <img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/micro/micro">
+    <a href="https://goreportcard.com/report/micro.dev/v4">
+    <img alt="Go Report Card" src="https://goreportcard.com/badge/micro.dev/v4">
     </a>
 	<a href="https://pkg.go.dev/micro.dev/v4?tab=doc"><img
     alt="Go.Dev reference"
