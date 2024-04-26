@@ -1,4 +1,4 @@
-name: release
+name: Archives
 
 on:
   push:
@@ -12,6 +12,12 @@ env:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: write
+      pull-requests: write
+      repository-projects: write
+
     steps:
       -
         name: Checkout
@@ -22,16 +28,41 @@ jobs:
       -
         name: Setup release environment
         run: |-
-          echo 'GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}' > .release-env
+          cat > docker-creds.json <<EOF
+          {
+            "registries": [
+                {
+                    "user": "${{ github.actor }}",
+                    "pass": "${{ secrets.GITHUB_TOKEN }}",
+                    "registry": "ghcr.io"
+                },
+                {
+                    "user": "${{ secrets.DOCKER_USERNAME }}",
+                    "pass": "${{ secrets.DOCKER_PASSWORD }}",
+                    "registry": "docker.io"
+                }
+            ]
+          }
+          EOF
       -
-        name: GoReleaser publish
+        name: GoReleaser docker
         run: |-
           docker run \
-            --rm \
+            -t --rm \
             -e CGO_ENABLED=1 \
-            --env-file .release-env \
+            -e "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" \
+            -e "DOCKER_CREDS_FILE=docker-creds.json" \
+            -e "DOCKER_FAIL_ON_LOGIN_ERROR=true" \
+            -v /var/run/docker.sock:/var/run/docker.sock \
             -v `pwd`:/micro \
             -w /micro \
             ghcr.io/goreleaser/goreleaser-cross:${{ env.GORELEASER_VERSION }} \
-            release --clean
+            release --clean --verbose
 
+      # -
+      #   name: Update pkg.go.dev docs
+      #   uses: andrewslotin/go-proxy-pull-action@master
+      # -
+      #   name: Goreportcard publish
+      #   run: |-
+      #     curl -X POST -F "repo=github.com/${{ github.repository }}" https://goreportcard.com/checks

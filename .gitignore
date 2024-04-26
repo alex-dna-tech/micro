@@ -40,4 +40,4 @@ test/services
 
 .air.toml
 .DS_Store
-.release-env
+docker-creds.json

@@ -1,9 +1,10 @@
 project_name: micro
 release:
   github:
-    owner: micro
+    owner: alex-dna-tech
     name: micro
   name_template: 'Release {{ .Tag }}'
+  replace_existing_artifacts: true
 env:
   - CGO_ENABLED=1
 builds:
@@ -161,4 +162,66 @@ changelog:
   sort: asc
   filters:
     exclude:
+    - '^docs:'
     - '^test:'
+
+dockers:
+- image_templates:
+    - "docker.io/dnat4/{{ .ProjectName }}:latest"
+    - "docker.io/dnat4/{{ .ProjectName }}:{{ .RawVersion }}"
+    - "docker.io/dnat4/{{ .ProjectName }}:{{ .Major }}"
+    - "docker.io/dnat4/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}"
+    - "docker.io/dnat4/{{ .ProjectName }}:{{ .Tag }}"
+
+    - "ghcr.io/alex-dna-tech/{{ .ProjectName }}:latest"
+    - "ghcr.io/alex-dna-tech/{{ .ProjectName }}:{{ .RawVersion }}"
+    - "ghcr.io/alex-dna-tech/{{ .ProjectName }}:{{ .Major }}"
+    - "ghcr.io/alex-dna-tech/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}"
+    - "ghcr.io/alex-dna-tech/{{ .ProjectName }}:{{ .Tag }}"
+  dockerfile: Dockerfile
+  build_flag_templates:
+    - --platform=linux/amd64
+    - --label=org.opencontainers.image.title={{ .ProjectName }}
+    - --label=org.opencontainers.image.description={{ .ReleaseNotes }}
+    - --label=org.opencontainers.image.url={{ .ReleaseURL }}
+    - --label=org.opencontainers.image.source={{ .GitURL }}
+    - --label=org.opencontainers.image.version={{ .RawVersion }}
+    - --label=org.opencontainers.image.created={{ .Timestamp }}
+    - --label=org.opencontainers.image.revision={{ .FullCommit }}
+    - --label=org.opencontainers.image.licenses=MIT
+
+- image_templates:
+    - "docker.io/dnat4/{{ .ProjectName }}:latest"
+    - "docker.io/dnat4/{{ .ProjectName }}:{{ .RawVersion }}"
+    - "docker.io/dnat4/{{ .ProjectName }}:{{ .Major }}"
+    - "docker.io/dnat4/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}"
+    - "docker.io/dnat4/{{ .ProjectName }}:{{ .Tag }}"
+
+    - "ghcr.io/alex-dna-tech/{{ .ProjectName }}:latest"
+    - "ghcr.io/alex-dna-tech/{{ .ProjectName }}:{{ .RawVersion }}"
+    - "ghcr.io/alex-dna-tech/{{ .ProjectName }}:{{ .Major }}"
+    - "ghcr.io/alex-dna-tech/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}"
+    - "ghcr.io/alex-dna-tech/{{ .ProjectName }}:{{ .Tag }}"
+  goarch: arm64
+  dockerfile: Dockerfile
+  build_flag_templates:
+  - --platform=linux/arm64/v8
+  - --label=org.opencontainers.image.title={{ .ProjectName }}
+  - --label=org.opencontainers.image.description={{ .ReleaseNotes }}
+  - --label=org.opencontainers.image.url={{ .ReleaseURL }}
+  - --label=org.opencontainers.image.source={{ .GitURL }}
+  - --label=org.opencontainers.image.version={{ .RawVersion }}
+  - --label=org.opencontainers.image.created={{ .Timestamp }}
+  - --label=org.opencontainers.image.revision={{ .FullCommit }}
+  - --label=org.opencontainers.image.licenses=MIT
+
+docker_manifests:
+- name_template: micro/{{ .ProjectName }}:{{ .RawVersion }}
+  image_templates:
+  - micro/{{ .ProjectName }}:{{ .RawVersion }}-amd64
+  - micro/{{ .ProjectName }}:{{ .RawVersion }}-arm64v8
+- name_template: micro/{{ .ProjectName }}:latest
+  image_templates:
+  - micro/{{ .ProjectName }}:{{ .RawVersion }}-amd64
+  - micro/{{ .ProjectName }}:{{ .RawVersion }}-arm64v8
+
