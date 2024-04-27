@@ -1,0 +1,119 @@
+project_name: micro
+before:
+  hooks:
+    - curl -s https://musl.cc/x86_64-linux-musl-cross.tgz -o /tmp/x86_64.tgz
+    - curl -s https://musl.cc/aarch64-linux-musl-cross.tgz -o /tmp/aarch64.tgz
+    - tar -xvzf /tmp/x86_64.tgz -C /tmp
+    - tar -xvzf /tmp/aarch64.tgz -C /tmp
+    - rm -f /tmp/x86_64.tgz /tmp/aarch64.tgz
+env:
+  - CGO_ENABLED=1
+builds:
+  - id: micro-amd64
+    goarch: [amd64]
+    goos: [linux]
+    binary: micro
+    main: ./cmd/micro
+    env:
+      - CC=/tmp/x86_64-linux-musl-cross/bin/x86_64-linux-musl-gcc
+      - CXX=/tmp/x86_64-linux-musl-cross/bin/x86_64-linux-musl-g++
+    flags: -trimpath
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{ .CommitDate }}
+
+  - id: micro-arm64
+    goarch: [arm64]
+    goos: [linux]
+    binary: micro
+    main: ./cmd/micro
+    env:
+      - CC=/tmp/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc
+      - CXX=/tmp/aarch64-linux-musl-cross/bin/aarch64-linux-musl-g++
+    flags: -trimpath
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{ .CommitDate }}
+
+nfpms:
+  - id: package
+    homepage: https://github.com/micro/micro
+    description: A Go Platform built for Developers
+    maintainer: Asim Aslam
+    license: MIT
+    vendor: Micro
+    bindir: /usr/bin
+    section: utils
+    formats:
+      - apk
+    dependencies:
+      - git make gcc g++
+    recommends:
+      - golang
+
+archives:
+  - builds:
+      - default
+    format: binary
+
+dockers:
+- image_templates:
+    - "dnat4/micro:v{{ .Version }}-amd64"
+    - "ghcr.io/alex-dna-tech/micro:v{{ .Version }}-amd64"
+  dockerfile: Dockerfile.release
+  build_flag_templates:
+      - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/goreleaser/goreleaser/main/README.md"
+      - "--label=io.artifacthub.package.logo-url=https://www.gravatar.com/avatar/09d1da3ea9ee61753219a19016d6a672?s=120&r=g&d=404"
+      - "--label=io.artifacthub.package.license=MIT"
+      - "--label=org.opencontainers.image.description=A Go Platform built for Developers"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.name={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source={{.GitURL}}"
+      - "--platform=linux/amd64"
+  goarch: amd64
+
+- image_templates:
+    - "dnat4/micro:v{{ .Version }}-arm64"
+    - "ghcr.io/alex-dna-tech/micro:v{{ .Version }}-arm64"
+  dockerfile: Dockerfile.release
+  build_flag_templates:
+      - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/goreleaser/goreleaser/main/README.md"
+      - "--label=io.artifacthub.package.logo-url=https://www.gravatar.com/avatar/09d1da3ea9ee61753219a19016d6a672?s=120&r=g&d=404"
+      - "--label=io.artifacthub.package.license=MIT"
+      - "--label=org.opencontainers.image.description=A Go Platform built for Developers"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.name={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source={{.GitURL}}"
+      - "--platform=linux/arm64"
+  goarch: arm64
+
+docker_manifests:
+  - name_template: "dnat4/micro:v{{ .Version }}"
+    image_templates:
+      - "dnat4/micro:v{{ .Version }}-amd64"
+      - "dnat4/micro:v{{ .Version }}-arm64"
+
+  - name_template: "ghcr.io/alex-dna-tech/micro:v{{ .Version }}"
+    image_templates:
+      - "ghcr.io/alex-dna-tech/micro:v{{ .Version }}-amd64"
+      - "ghcr.io/alex-dna-tech/micro:v{{ .Version }}-arm64"
+
+  - name_template: "dnat4/micro:latest"
+    image_templates:
+      - "dnat4/micro:v{{ .Version }}-amd64"
+      - "dnat4/micro:v{{ .Version }}-arm64"
+
+  - name_template: "ghcr.io/alex-dna-tech/micro:latest"
+    image_templates:
+      - "ghcr.io/alex-dna-tech/micro:v{{ .Version }}-amd64"
+      - "ghcr.io/alex-dna-tech/micro:v{{ .Version }}-arm64"
+
+
