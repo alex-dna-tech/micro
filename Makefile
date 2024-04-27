@@ -50,8 +50,18 @@ gorelease-dry-run:
 	docker run \
 		--rm \
 		-e CGO_ENABLED=1 \
-		-v /var/run/docker.sock:/var/run/docker.sock \
 		-v $(CURDIR):/$(NAME) \
 		-w /$(NAME) \
 		ghcr.io/goreleaser/goreleaser-cross:v1.20.6 \
 		--clean --verbose --skip-validate --skip-publish --snapshot
+
+.PHONY: gorelease-dry-run-docker
+gorelease-dry-run-docker:
+	docker run \
+		--rm \
+		-e CGO_ENABLED=1 \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v $(CURDIR):/$(NAME) \
+		-w /$(NAME) \
+		ghcr.io/goreleaser/goreleaser-cross:v1.20.6 \
+		--clean --verbose --skip-validate --skip-publish --snapshot --config .goreleaser-docker.yml

@@ -1,0 +1,104 @@
+project_name: micro
+env:
+  - CGO_ENABLED=1
+builds:
+  - id: micro-amd64
+    goarch: [amd64]
+    goos: [linux]
+    binary: micro-amd64
+    main: ./cmd/micro
+    env:
+      - CC=x86_64-linux-gnu-gcc
+      - CXX=x86_64-linux-gnu-g++
+    flags: -trimpath
+    ldflags:
+      - -s -w
+      - -X micro.dev/v4/cmd.GitCommit={{ .ShortCommit }}
+      - -X micro.dev/v4/cmd.GitTag={{ .Tag }}
+      - -X micro.dev/v4/cmd.BuildDate={{ .Timestamp }}
+    no_unique_dist_dir: true
+
+  - id: micro-arm64
+    goarch: [arm64]
+    goos: [linux]
+    binary: micro-arm64
+    main: ./cmd/micro
+    env:
+      - CC=aarch64-linux-gnu-gcc
+      - CXX=aarch64-linux-gnu-g++
+    flags: -trimpath
+    ldflags:
+      - -s -w
+      - -X micro.dev/v4/cmd.GitCommit={{ .ShortCommit }}
+      - -X micro.dev/v4/cmd.GitTag={{ .Tag }}
+      - -X micro.dev/v4/cmd.BuildDate={{ .Timestamp }}
+    no_unique_dist_dir: true
+
+archives:
+  - builds:
+      - default
+    format: binary
+
+dockers:
+- image_templates:
+    - "dnat4/micro:v{{ .Version }}-amd64"
+    - "ghcr.io/alex-dna-tech/micro:v{{ .Version }}-amd64"
+  dockerfile: Dockerfile.amd64
+  build_flag_templates:
+      - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/goreleaser/goreleaser/main/README.md"
+      - "--label=io.artifacthub.package.logo-url=https://www.gravatar.com/avatar/09d1da3ea9ee61753219a19016d6a672?s=120&r=g&d=404"
+      - "--label=io.artifacthub.package.license=MIT"
+      - "--label=org.opencontainers.image.description=A Go Platform built for Developers"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.name={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source={{.GitURL}}"
+      - "--platform=linux/amd64"
+      - "--build-arg=USER=m3o"
+      - "--build-arg=UID=1002"
+      - "--build-arg=GID=1002"
+  goarch: amd64
+
+- image_templates:
+    - "dnat4/micro:v{{ .Version }}-arm64"
+    - "ghcr.io/alex-dna-tech/micro:v{{ .Version }}-arm64"
+  dockerfile: Dockerfile.arm64
+  build_flag_templates:
+      - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/goreleaser/goreleaser/main/README.md"
+      - "--label=io.artifacthub.package.logo-url=https://www.gravatar.com/avatar/09d1da3ea9ee61753219a19016d6a672?s=120&r=g&d=404"
+      - "--label=io.artifacthub.package.license=MIT"
+      - "--label=org.opencontainers.image.description=A Go Platform built for Developers"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.name={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source={{.GitURL}}"
+      - "--platform=linux/arm64"
+      - "--build-arg=USER=micro"
+      - "--build-arg=UID=1001"
+      - "--build-arg=GID=1001"
+  goarch: arm64
+
+docker_manifests:
+  - name_template: "dnat4/micro:v{{ .Version }}"
+    image_templates:
+      - "dnat4/micro:v{{ .Version }}-amd64"
+      - "dnat4/micro:v{{ .Version }}-arm64"
+
+  - name_template: "ghcr.io/alex-dna-tech/micro:v{{ .Version }}"
+    image_templates:
+      - "ghcr.io/alex-dna-tech/micro:v{{ .Version }}-amd64"
+      - "ghcr.io/alex-dna-tech/micro:v{{ .Version }}-arm64"
+
+  - name_template: "dnat4/micro:latest"
+    image_templates:
+      - "dnat4/micro:v{{ .Version }}-amd64"
+      - "dnat4/micro:v{{ .Version }}-arm64"
+
+  - name_template: "ghcr.io/alex-dna-tech/micro:latest"
+    image_templates:
+      - "ghcr.io/alex-dna-tech/micro:v{{ .Version }}-amd64"
+      - "ghcr.io/alex-dna-tech/micro:v{{ .Version }}-arm64"
+
+
