@@ -1,4 +1,4 @@
-name: GoRelease
+name: Artifacts
 
 on:
   push:
@@ -15,8 +15,6 @@ jobs:
     permissions:
       packages: write
       contents: write
-      pull-requests: write
-      repository-projects: write
 
     steps:
       -
@@ -26,34 +24,12 @@ jobs:
         name: Fetch tags
         run: git fetch --prune --unshallow --tags -f
       -
-        name: Setup release environment
-        run: |-
-          cat > docker-creds.json <<EOF
-          {
-            "registries": [
-                {
-                    "user": "${{ github.actor }}",
-                    "pass": "${{ secrets.GITHUB_TOKEN }}",
-                    "registry": "ghcr.io"
-                },
-                {
-                    "user": "${{ secrets.DOCKER_USERNAME }}",
-                    "pass": "${{ secrets.DOCKER_PASSWORD }}",
-                    "registry": "docker.io"
-                }
-            ]
-          }
-          EOF
-      -
-        name: GoReleaser docker
+        name: GoReleaser archives
         run: |-
           docker run \
-            -t --rm \
+            --rm \
             -e CGO_ENABLED=1 \
             -e "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" \
-            -e "DOCKER_CREDS_FILE=docker-creds.json" \
-            -e "DOCKER_FAIL_ON_LOGIN_ERROR=true" \
-            -v /var/run/docker.sock:/var/run/docker.sock \
             -v `pwd`:/micro \
             -w /micro \
             ghcr.io/goreleaser/goreleaser-cross:${{ env.GORELEASER_VERSION }} \
