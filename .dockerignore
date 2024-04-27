@@ -1,6 +1,7 @@
-dist/
-test/
-vendor/
+.micro/
 Dockerfile
+dist/
 micro
 micro.exe
+test/
+vendor/
