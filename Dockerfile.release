@@ -1,0 +1,25 @@
+FROM alpine:3.19
+# ENV USER=micro
+# ENV GROUPNAME=$USER
+# ENV UID=1001
+# ENV GID=1001
+# RUN addgroup --gid "$GID" "$GROUPNAME"
+# RUN adduser \
+#     --disabled-password \
+#     --gecos "" \
+#     --home "/micro" \
+#     --ingroup "$GROUPNAME" \
+#     --no-create-home \
+#     --uid "$UID" "$USER"
+# RUN apk --no-cache add git make file gcc g++ curl ca-certificates
+ENV PATH /usr/local/go/bin:/$USER/go/bin:$PATH
+COPY --from=golang:1.20.14-alpine /usr/local/go /usr/local/go
+COPY micro_*.apk /tmp/
+RUN apk add --no-cache --allow-untrusted /tmp/micro_*.apk
+USER ${USER}
+WORKDIR /micro
+EXPOSE 8080
+EXPOSE 8081
+ENTRYPOINT ["/usr/bin/micro"]
+CMD ["--help"]
+
