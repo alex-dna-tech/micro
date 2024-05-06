@@ -51,7 +51,7 @@ nfpms:
     formats:
       - apk
     dependencies:
-      - git make gcc g++
+      - musl
     recommends:
       - golang
 
@@ -68,13 +68,14 @@ dockers:
   build_flag_templates:
       - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/goreleaser/goreleaser/main/README.md"
       - "--label=io.artifacthub.package.logo-url=https://www.gravatar.com/avatar/09d1da3ea9ee61753219a19016d6a672?s=120&r=g&d=404"
-      - "--label=io.artifacthub.package.license=MIT"
       - "--label=org.opencontainers.image.description=A Go Platform built for Developers"
       - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.name={{.ProjectName}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
       - "--label=org.opencontainers.image.source={{.GitURL}}"
+      - "--label=org.opencontainers.image.url={{.GitURL}}"
+      - "--label=org.opencontainers.image.licenses=MIT"
       - "--platform=linux/amd64"
   goarch: amd64
 
@@ -85,13 +86,14 @@ dockers:
   build_flag_templates:
       - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/goreleaser/goreleaser/main/README.md"
       - "--label=io.artifacthub.package.logo-url=https://www.gravatar.com/avatar/09d1da3ea9ee61753219a19016d6a672?s=120&r=g&d=404"
-      - "--label=io.artifacthub.package.license=MIT"
       - "--label=org.opencontainers.image.description=A Go Platform built for Developers"
       - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.name={{.ProjectName}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
       - "--label=org.opencontainers.image.source={{.GitURL}}"
+      - "--label=org.opencontainers.image.url={{.GitURL}}"
+      - "--label=org.opencontainers.image.licenses=MIT"
       - "--platform=linux/arm64"
   goarch: arm64
 
