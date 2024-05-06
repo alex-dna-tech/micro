@@ -51,7 +51,7 @@ nfpms:
     formats:
       - apk
     dependencies:
-      - git make gcc g++
+      - musl
     recommends:
       - golang
 

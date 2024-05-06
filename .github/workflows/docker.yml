@@ -1,30 +1,39 @@
 name: Docker
 
-on: push
-  # push:
-  #   branches-ignore:
-  #     - '**'
-  #   tags:
-  #     - 'v*.*.*'
-env:
-  GORELEASER_VERSION: latest
+on:
+  push:
+    tags:
+      - 'v*.*.*'
 
 jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      packages: write
       contents: write
 
     steps:
       -
         name: Checkout
         uses: actions/checkout@v4
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          fetch-depth: 0
-      # -
-      #   name: Fetch tags
-      #   run: git fetch --prune --unshallow --tags -f
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      -
+        name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Set up Go
         uses: actions/setup-go@v4
@@ -38,36 +47,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # -
-      #   name: Setup release environment
-      #   run: |-
-      #     cat > docker-creds.json <<EOF
-      #     {
-      #       "registries": [
-      #           {
-      #               "user": "${{ github.actor }}",
-      #               "pass": "${{ secrets.GITHUB_TOKEN }}",
-      #               "registry": "ghcr.io"
-      #           },
-      #           {
-      #               "user": "${{ secrets.DOCKER_USERNAME }}",
-      #               "pass": "${{ secrets.DOCKER_PASSWORD }}",
-      #               "registry": "docker.io"
-      #           }
-      #       ]
-      #     }
-      #     EOF
-      # -
-      #   name: GoReleaser docker
-      #   run: |-
-      #     docker run \
-      #       -t --rm \
-      #       -e CGO_ENABLED=1 \
-      #       -e "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" \
-      #       -e "DOCKER_CREDS_FILE=docker-creds.json" \
-      #       -e "DOCKER_FAIL_ON_LOGIN_ERROR=true" \
-      #       -v /var/run/docker.sock:/var/run/docker.sock \
-      #       -v `pwd`:/micro \
-      #       -w /micro \
-      #       ghcr.io/goreleaser/goreleaser-cross:${{ env.GORELEASER_VERSION }} \
-      #       release --clean --verbose --config .goreleaser-docker.yml
