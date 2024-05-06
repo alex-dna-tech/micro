@@ -19,4 +19,5 @@ jobs:
       name: Run tests
       env:
         IN_TRAVIS_CI: yes
-      run: go test -v ./...
+      run: go test -race -v ./...
+

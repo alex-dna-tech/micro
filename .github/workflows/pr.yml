@@ -1,6 +1,9 @@
 name: Sanity Cross Build
 on: pull_request
 
+permissions:
+  contents: read
+
 jobs:
   prtest:
     name: PR sanity check
@@ -19,3 +22,8 @@ jobs:
     -
       name: Run dry cross build
       run: make gorelease-dry-run
+    -
+      name: Golangci lint
+      uses: golangci/golangci-lint-action@v5
+      with:
+        version: latest
