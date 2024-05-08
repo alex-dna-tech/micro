@@ -18,10 +18,9 @@ import (
 	tmpl "micro.dev/v4/cmd/client/new/template"
 )
 
-func protoComments(goDir, alias string) []string {
+func protoComments(alias string) []string {
 	return []string{
 		"cd " + alias,
-		"go mod tidy",
 		"make proto",
 		"micro run .\n",
 	}
@@ -174,10 +173,12 @@ func Run(ctx *cli.Context) error {
 	if strings.HasPrefix(goVersion, "go") {
 		goVersion = strings.TrimPrefix(goVersion, "go")
 	}
+	parts := strings.Split(goVersion, ".")
+	goVersion = parts[0] + "." + parts[1]
 
 	c := config{
 		Alias:     dir,
-		Comments:  protoComments(goDir, dir),
+		Comments:  protoComments(dir),
 		Dir:       dir,
 		GoVersion: goVersion,
 		GoDir:     goDir,
@@ -207,7 +208,7 @@ func init() {
 	cmd.Register(&cli.Command{
 		Name:        "new",
 		Usage:       "Create a service template",
-		Description: `'micro new' scaffolds a new service skeleton. Example: 'micro new helloworld && cd helloworld'`,
+		Description: `'micro new' scaffolds a new service skeleton. Example: 'micro new hello && cd hello'`,
 		Action:      Run,
 	})
 }
