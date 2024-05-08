@@ -10,6 +10,7 @@ DOCKER_BUILD_ARGS = --platform linux/amd64 --platform linux/arm64
 DOCKER_IMAGE_NAME = micro/$(NAME)
 DOCKER_IMAGE_TAG = --tag $(DOCKER_IMAGE_NAME):$(GIT_TAG)-$(GIT_COMMIT) --tag $(DOCKER_IMAGE_NAME):latest
 
+GOPATH = $(shell go env GOPATH)
 PROTO_FILES = $(wildcard proto/**/*.proto)
 PROTO_GO_MICRO = $(PROTO_FILES:.proto=.pb.go) $(PROTO_FILES:.proto=.pb.micro.go)
 
@@ -33,11 +34,11 @@ proto: $(PROTO_GO_MICRO)
 %.pb.micro.go %.pb.go: %.proto clean
 	protoc --proto_path=. --micro_out=. --go_out=. $<
 
-.PHONY: test
+.PHONY: vet
 vet:
 	go vet ./...
 
-.PHONY: vet
+.PHONY: test
 test: vet
 	go test -v -race ./...
 
@@ -65,3 +66,11 @@ gorelease-dry-run-docker:
 		-w /$(NAME) \
 		ghcr.io/goreleaser/goreleaser-cross:latest \
 		--clean --verbose --skip-validate --skip-publish --snapshot --config .goreleaser-docker.yml
+
+.PHONY: lint
+lint: $(GOPATH)/bin/golangci-lint
+	golangci-lint run ./...
+
+$(GOPATH)/bin/golangci-lint:
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.58.0
+

@@ -2,8 +2,6 @@ name: Artifacts
 
 on:
   push:
-    branches-ignore:
-      - '**'
     tags:
       - 'v*.*.*'
 env:
@@ -35,10 +33,3 @@ jobs:
             ghcr.io/goreleaser/goreleaser-cross:${{ env.GORELEASER_VERSION }} \
             release --clean --verbose
 
-      # -
-      #   name: Update pkg.go.dev docs
-      #   uses: andrewslotin/go-proxy-pull-action@master
-      # -
-      #   name: Goreportcard publish
-      #   run: |-
-      #     curl -X POST -F "repo=github.com/${{ github.repository }}" https://goreportcard.com/checks

@@ -1,0 +1,22 @@
+name: Update docs
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      -
+        name: Update pkg.go.dev docs
+        uses: andrewslotin/go-proxy-pull-action@master
+        with:
+          import_path: micro.dev/v4
+      -
+        name: Goreportcard publish
+        run: |-
+          echo ${{ github.repository }}
+          curl -X POST -F "repo=micro.dev/v4" https://goreportcard.com/checks
