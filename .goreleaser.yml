@@ -4,6 +4,7 @@ release:
     owner: micro
     name: micro
   name_template: 'Release {{ .Tag }}'
+
 env:
   - CGO_ENABLED=1
 builds:
@@ -161,4 +162,5 @@ changelog:
   sort: asc
   filters:
     exclude:
+    - '^docs:'
     - '^test:'

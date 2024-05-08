@@ -1,4 +1,7 @@
+.micro/
+Dockerfile
 dist/
+micro
+micro.exe
 test/
 vendor/
-Dockerfile

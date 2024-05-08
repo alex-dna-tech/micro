@@ -1,18 +1,14 @@
-FROM golang:1.20.14-alpine
+FROM golang:1.20.14-alpine as builder
 RUN apk --no-cache add make gcc g++
 WORKDIR /micro
 COPY . .
-RUN make micro && mv micro /usr/local/go/bin/micro
+RUN make micro
 
 FROM alpine:latest
 ENV USER=micro
 ENV GROUPNAME=$USER
 ARG UID=1001
 ARG GID=1001
-RUN apk --no-cache add make gcc g++
-RUN apk --no-cache add git curl ca-certificates
-COPY --from=0 /usr/local/go /usr/local/go
-ENV PATH /usr/local/go/bin:/$USER/go/bin:$PATH
 RUN addgroup --gid "$GID" "$GROUPNAME" \
     && adduser \
     --disabled-password \
@@ -21,6 +17,10 @@ RUN addgroup --gid "$GID" "$GROUPNAME" \
     --ingroup "$GROUPNAME" \
     --no-create-home \
     --uid "$UID" "$USER"
+ENV PATH /usr/local/go/bin:/$USER/go/bin:$PATH
+RUN apk --no-cache add git make gcc g++ curl ca-certificates
+COPY --from=builder /usr/local/go /usr/local/go
+COPY --from=builder /micro/micro /usr/local/go/bin/
 USER ${USER}
 WORKDIR /micro
 EXPOSE 8080

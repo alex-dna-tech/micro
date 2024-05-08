@@ -28,16 +28,15 @@ _testmain.go
 coverage.txt
 coverage.out
 
-# ignore locally built binaries
-micro.exe
-micro
+# ignore locally built artifacts
 !micro/
-dist/
-
 *.bak
-
-test/services
-
-.air.toml
 .DS_Store
-.release-env
+.air.toml
+.ash_history
+.micro/
+dist/
+docker-creds.json
+micro
+micro.exe
+test/services

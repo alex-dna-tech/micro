@@ -1,4 +1,4 @@
-name: release
+name: Artifacts
 
 on:
   push:
@@ -12,6 +12,10 @@ env:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: write
+
     steps:
       -
         name: Checkout
@@ -20,18 +24,21 @@ jobs:
         name: Fetch tags
         run: git fetch --prune --unshallow --tags -f
       -
-        name: Setup release environment
-        run: |-
-          echo 'GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}' > .release-env
-      -
-        name: GoReleaser publish
+        name: GoReleaser archives
         run: |-
           docker run \
             --rm \
             -e CGO_ENABLED=1 \
-            --env-file .release-env \
+            -e "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" \
             -v `pwd`:/micro \
             -w /micro \
             ghcr.io/goreleaser/goreleaser-cross:${{ env.GORELEASER_VERSION }} \
-            release --clean
+            release --clean --verbose
 
+      # -
+      #   name: Update pkg.go.dev docs
+      #   uses: andrewslotin/go-proxy-pull-action@master
+      # -
+      #   name: Goreportcard publish
+      #   run: |-
+      #     curl -X POST -F "repo=github.com/${{ github.repository }}" https://goreportcard.com/checks
